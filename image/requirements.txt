@@ -1,0 +1,6 @@
+boto3
+pydantic
+pydantic_ai
+python-dotenv
+Requests
+xhtml2pdf
