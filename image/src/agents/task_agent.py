@@ -13,6 +13,7 @@ Se o prazo não for especificado, considere como a data de hoje
 Se o prioridade não for especificada, considere como 'urgente'
 
 Horário atual: {datetime.now()}
+Dia da semana: {datetime.now().strftime('%A')}
 """
 
 class List(BaseModel):
