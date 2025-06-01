@@ -35,11 +35,13 @@ def extract_attachs(raw_email: str, path='/tmp'):
     msg = BytesParser(policy=policy.default).parse(BytesIO(raw_bytes))
 
     for part in msg.iter_attachments():
-        attach = File(
-            name=part.get_filename(),
-            content=part.get_payload(decode=True)
-        )
-        directory.create_file(attach, path)
+        content_disposition = part.get_content_disposition()
+        if content_disposition == 'attachment':
+            attach = File(
+                name=part.get_filename(),
+                content=part.get_payload(decode=True)
+            )
+            directory.create_file(attach, path)
 
 def extract_subject(raw_email: str) -> str:
     msg = message_from_string(raw_email, policy=default)
