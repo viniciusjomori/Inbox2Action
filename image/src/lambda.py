@@ -17,7 +17,6 @@ def extract_attachs(raw_email, content):
     
 async def async_hendler(event, context):
     file = event['Records'][0]['s3']['object']['key']
-    
     raw_email = s3.get_content(file)
     subject: str = smtp.extract_subject(raw_email)
     content = smtp.extract_content(raw_email)
@@ -26,7 +25,7 @@ async def async_hendler(event, context):
 
     result = await task_agent.run(json.dumps({
         'subject': subject,
-        'content': content['text/plain'][:1000]
+        'content': content['text/plain'][:3000]
     }))
 
     clickup.create_task(
