@@ -23,7 +23,6 @@ def extract_content(raw_email: str):
             if content_type in conteudos and "attachment" not in content_disposition:
                 conteudos[content_type] = part.get_content()
     else:
-        # Caso não seja multipart, assume que o conteúdo principal está no corpo
         content_type = msg.get_content_type()
         if content_type in conteudos:
             conteudos[content_type] = msg.get_content()
