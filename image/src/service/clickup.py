@@ -54,6 +54,8 @@ def create_task(
     
     for file in directory.ls_files('/tmp/attachs'):
         attach(task_id, file)
+    
+    return task_id
 
 def get_lists(space_id, archived=False):
     response = http_client.get(

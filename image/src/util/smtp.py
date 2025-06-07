@@ -3,6 +3,7 @@ from email.policy import default
 from email import policy
 from email.parser import BytesParser
 from io import BytesIO
+from email.utils import parseaddr
 
 from src.util import directory
 from src.util.directory import File
@@ -45,3 +46,8 @@ def extract_attachs(raw_email: str, path='/tmp'):
 def extract_subject(raw_email: str) -> str:
     msg = message_from_string(raw_email, policy=default)
     return msg.get('Subject', '')
+
+def extract_sender(raw_email: str) -> str:
+    msg = message_from_string(raw_email, policy=default)
+    name, email = parseaddr(msg.get('From', ''))
+    return email
