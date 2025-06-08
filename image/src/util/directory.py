@@ -38,35 +38,8 @@ def ls_dirs(path):
     dirs = [dir for dir in dirs if is_dir(f'{path}/{dir}')]
     return dirs
 
-def get_file(path):
-    if not (exists(path) and is_file(path)):
-        return None
-
-    binary = is_binary(path)
-    
-    method = 'rb' if binary else 'r'
-    encoding = None if binary else 'utf-8'
-    
-    with open(path, method, encoding=encoding) as file:
-        filename = get_filename(path)
-        content = file.read()
-        return File(filename, content, path, binary)
-
-def get_files(path, extension=None):
-    filenames = []
-    for f in ls_files(path):
-        if extension and f.endswith(extension):
-            filenames.append(f)
-    
-    files = []
-    for name in filenames:
-        file = get_file(f'{path}/{name}')
-        files.append(file)
-    
-    return files
-
 def create_file(file, path=""):
-    binary = is_binary(file.name)
+    binary = is_binary(file.content)
 
     method = 'wb' if binary else 'w'
     encoding = None if binary else 'utf-8'
@@ -77,8 +50,7 @@ def create_file(file, path=""):
     path = os.path.join(path, file.name)
 
     with open(path, method, encoding=encoding) as new_file:
-        new_file.write(file.content)
-    
+        new_file.write(file.content)    
 
 def delete_file(path):
     os.remove(path)
@@ -93,17 +65,11 @@ def clear_dir(path):
     delete_dir(path)
     create_dir(path)
 
-def is_binary(path):
-    extension = get_extension(path)
+def is_binary(content):
+    if isinstance(content, str):
+        return False
 
-    binary_extensions = {
-        'exe', 'bin', 'jpg', 'jpeg', 'png', 'gif', 'bmp', 
-        'zip', 'rar', '7z', 'tar', 'gz', 'iso', 'dll', 
-        'so', 'mp3', 'mp4', 'avi', 'mkv', 'mov', 'flac',
-        'wav', 'ogg', 'pdf', 'doc', 'docx', 'ppt', 'pptx', 
-        'xls', 'xlsx', 'pfx'
-    }
-    return extension.lower() in binary_extensions
+    return True
 
 def get_extension(path):
     _, extension = os.path.splitext(path)
