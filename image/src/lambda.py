@@ -6,15 +6,22 @@ import asyncio
 import json
 
 from src.agents.task_agent import task_agent
-from src.util import pdf, html, rawemail
+from src.util import html, rawemail, directory
+from src.util.directory import File
 from src.aws import s3, ses
 from src.service import clickup
 
 def extract_attachs(raw_email, content):
     rawemail.extract_attachs(raw_email, path='/tmp/attachs')
 
-    content = content['text/html'] if content['text/html'] else content['text/plain']
-    pdf.from_html(content, '/tmp/attachs', 'email.pdf')
+    if content['text/html']:
+        content = content['text/html']
+    
+    else:
+        content = content['text/plain']
+
+    file = File('email.html', content)
+    directory.create_file(file, '/tmp/attachs')
 
 def send_email(raw_email, result, task_id):
     email = rawemail.extract_sender(raw_email)
