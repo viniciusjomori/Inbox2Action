@@ -1,12 +1,13 @@
 import os
 import shutil
+import base64
 
 class File:
     def __init__(self, name, content, path="", binary=False):
         self.name = name
         self.content = content
         self.path = path
-        self.binany = binary
+        self.binary = binary
 
 def exists(path):
     return os.path.exists(path)
@@ -107,3 +108,7 @@ def is_binary(path):
 def get_extension(path):
     _, extension = os.path.splitext(path)
     return extension.lstrip('.')
+
+def to_base64(path):
+    with open(path, "rb") as img:
+        return base64.b64encode(img.read()).decode('utf-8')

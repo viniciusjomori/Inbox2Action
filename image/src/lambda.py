@@ -16,6 +16,10 @@ def extract_attachs(raw_email, content):
 
     if content['text/html']:
         content = content['text/html']
+        cids = rawemail.extract_inline_images(raw_email)
+
+        for old, new in cids.items():
+            content = content.replace(f'cid:{old}', f'data:image/png;base64,{new}')
     
     else:
         content = content['text/plain']
