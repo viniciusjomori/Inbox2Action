@@ -1,22 +1,23 @@
 from dotenv import load_dotenv
+
 load_dotenv(dotenv_path='/var/task/.env')
 
 import asyncio
 import json
 
 from src.agents.task_agent import task_agent
-from src.util import smtp, pdf, html
+from src.util import pdf, html, rawemail
 from src.aws import s3, ses
 from src.service import clickup
 
 def extract_attachs(raw_email, content):
-    smtp.extract_attachs(raw_email, path='/tmp/attachs')
+    rawemail.extract_attachs(raw_email, path='/tmp/attachs')
 
     content = content['text/html'] if content['text/html'] else content['text/plain']
     pdf.from_html(content, '/tmp/attachs', 'email.pdf')
 
 def send_email(raw_email, result, task_id):
-    email = smtp.extract_sender(raw_email)
+    email = rawemail.extract_sender(raw_email)
     content = html.create_task_table(
         id=task_id,
         name=result.output.name,
@@ -35,8 +36,8 @@ def send_email(raw_email, result, task_id):
 async def async_hendler(event, context):
     file = event['Records'][0]['s3']['object']['key']
     raw_email = s3.get_content(file)
-    subject: str = smtp.extract_subject(raw_email)
-    content = smtp.extract_content(raw_email)
+    subject: str = rawemail.extract_subject(raw_email)
+    content = rawemail.extract_content(raw_email)
     
     extract_attachs(raw_email, content)
 
