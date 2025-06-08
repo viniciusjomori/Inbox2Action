@@ -11,7 +11,7 @@ from src.util.directory import File
 def extract_content(raw_email: str):
     msg = message_from_string(raw_email, policy=default)
 
-    conteudos = {
+    content = {
         'text/plain': None,
         'text/html': None
     }
@@ -21,14 +21,14 @@ def extract_content(raw_email: str):
             content_type = part.get_content_type()
             content_disposition = str(part.get("Content-Disposition", ""))
             
-            if content_type in conteudos and "attachment" not in content_disposition:
-                conteudos[content_type] = part.get_content()
+            if content_type in content and "attachment" not in content_disposition:
+                content[content_type] = part.get_content()
     else:
         content_type = msg.get_content_type()
-        if content_type in conteudos:
-            conteudos[content_type] = msg.get_content()
+        if content_type in content:
+            content[content_type] = msg.get_content()
 
-    return conteudos
+    return content
 
 def extract_attachs(raw_email: str, path='/tmp'):
     raw_bytes = raw_email.encode('utf-8')
