@@ -13,18 +13,5 @@ export class ClickupStack extends cdk.Stack {
       timeout: cdk.Duration.seconds(60),
       architecture: lambda.Architecture.X86_64,
     });
-
-    const functionUrl = dockerFunc.addFunctionUrl({
-      authType: lambda.FunctionUrlAuthType.NONE,
-      cors: {
-        allowedMethods: [lambda.HttpMethod.ALL],
-        allowedHeaders: ["*"],
-        allowedOrigins: ["*"],
-      },
-    });
-
-    new cdk.CfnOutput(this, "FunctionUrlValue", {
-      value: functionUrl.url,
-    });
   }
 }
