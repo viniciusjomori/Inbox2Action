@@ -1,13 +1,16 @@
 import boto3
 import os
 
-ses_client = boto3.client('ses', region_name='us-east-1')
+name = os.getenv('EMAIL_NAME')
+address = os.getenv('EMAIL_ADDRESS')
 bcc = os.getenv('EMAIL_ADDRESS_BCC')
 bcc = bcc.split(', ')
 
+ses_client = boto3.client('ses', region_name='us-east-1')
+
 def send_email(to, content, subject):
     ses_client.send_email(
-        Source=os.getenv('EMAIL_ADDRESS_SENDER'),
+        Source=f'{name} <{address}>',
         Destination={
             'ToAddresses': to,
             'BccAddresses': bcc
