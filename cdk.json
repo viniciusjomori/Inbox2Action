@@ -1,5 +1,5 @@
 {
-  "app": "npx ts-node --prefer-ts-exts bin/clickup.ts",
+  "app": "npx ts-node --prefer-ts-exts bin/inbox2action.ts",
   "watch": {
     "include": [
       "**"

@@ -1,8 +1,8 @@
 {
-  "name": "clickup",
+  "name": "inbox2action",
   "version": "0.1.0",
   "bin": {
-    "clickup": "bin/clickup.js"
+    "inbox2action": "bin/inbox2action.js"
   },
   "scripts": {
     "build": "tsc",
