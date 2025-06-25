@@ -1,20 +1,24 @@
-#!/usr/bin/env node
-import * as cdk from 'aws-cdk-lib';
-import { Inbox2ActionStack } from '../lib/inbox2action-stack';
+import * as cdk from 'aws-cdk-lib'
+import { Inbox2ActionStack } from '../lib/inbox2action-stack'
+import * as fs from 'fs';
+import * as path from 'path';
 
 const app = new cdk.App();
-new Inbox2ActionStack(app, 'Inbox2ActionStack', {
-  /* If you don't specify 'env', this stack will be environment-agnostic.
-   * Account/Region-dependent features and context lookups will not work,
-   * but a single synthesized template can be deployed anywhere. */
 
-  /* Uncomment the next line to specialize this stack for the AWS Account
-   * and Region that are implied by the current CLI configuration. */
-  // env: { account: process.env.CDK_DEFAULT_ACCOUNT, region: process.env.CDK_DEFAULT_REGION },
+let envName = app.node.tryGetContext('env')
+const config = getConfig(envName)
 
-  /* Uncomment the next line if you know exactly what Account and Region you
-   * want to deploy the stack to. */
-  // env: { account: '123456789012', region: 'us-east-1' },
-
-  /* For more information, see https://docs.aws.amazon.com/cdk/latest/guide/environments.html */
+new Inbox2ActionStack(app, 'Inbox2Action', {
+  stackName: `inbox2action-stack-${envName}`,
+  envName: envName,
+  ...config
 });
+
+function getConfig(envName: string) {
+  const configPath = path.resolve(__dirname, `../config/${envName}.json`);
+  
+  if (!fs.existsSync(configPath)) throw new Error(`env not found: ${configPath}`);
+
+  const config = JSON.parse(fs.readFileSync(configPath, 'utf-8'));
+  return config
+}
