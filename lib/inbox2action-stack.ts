@@ -1,14 +1,17 @@
 import * as cdk from "aws-cdk-lib";
 import { Construct } from "constructs";
 import * as lambda from "aws-cdk-lib/aws-lambda";
+import * as s3 from 'aws-cdk-lib/aws-s3';
+import * as ses from 'aws-cdk-lib/aws-ses';
+import * as actions from 'aws-cdk-lib/aws-ses-actions';
+import * as iam from 'aws-cdk-lib/aws-iam';
+import * as s3n from 'aws-cdk-lib/aws-s3-notifications';
+import * as crypto from 'crypto';
 
 export interface Inbox2ActionProps extends cdk.StackProps {
   envName: string;
   username: string;
   openai: { apiKey: string };
-  aws: {
-    bucketName: string;
-  }
   clickUp: {
     apiKey: string,
     teamId: string,
@@ -25,6 +28,13 @@ export class Inbox2ActionStack extends cdk.Stack {
   constructor(scope: Construct, id: string, props: Inbox2ActionProps) {
     super(scope, id, props);
 
+    const account_id = process.env.CDK_DEFAULT_ACCOUNT
+    
+    const stackName = cdk.Stack.of(this);
+    const hash = crypto.createHash('md5').update(stackName.stackName).digest('hex').slice(0, 8);
+    
+    const bucketName = `inbox2action-${props.envName}-bucket-${hash}`
+    
     const dockerFunc = new lambda.DockerImageFunction(this, "DockerFunc", {
       functionName: `inbox2action-${props.envName}-lambda`,
       code: lambda.DockerImageCode.fromImageAsset("./image"),
@@ -34,7 +44,7 @@ export class Inbox2ActionStack extends cdk.Stack {
       environment: {
         'USERNAME': props.username,
         'OPENAI_API_KEY': props.openai.apiKey,
-        'AWS_BUCKET_NAME': props.aws.bucketName,
+        'AWS_BUCKET_NAME': bucketName,
         'CLICKUP_API_KEY': props.clickUp.apiKey,
         'CLICKUP_TEAM_ID': props.clickUp.teamId,
         'CLICKUP_SPACE_ID': props.clickUp.spaceId,
@@ -43,5 +53,65 @@ export class Inbox2ActionStack extends cdk.Stack {
         'EMAIL_ADDRESS_BCC': props.email.bcc,
       }
     });
+
+    dockerFunc.addToRolePolicy(new iam.PolicyStatement({
+      actions: ['ses:SendEmail', 'ses:SendRawEmail'],
+      resources: ['*'],
+      conditions: {
+        StringEquals: {
+          'ses:FromAddress': props.email.address
+        }
+      }
+    }));
+    
+    const bucket = new s3.Bucket(this, bucketName, {
+      bucketName: bucketName,
+      versioned: false,
+      removalPolicy: cdk.RemovalPolicy.DESTROY,
+      autoDeleteObjects: true
+    });
+    
+    bucket.grantRead(dockerFunc, 'emails/*');
+    
+    bucket.addToResourcePolicy(new iam.PolicyStatement({
+      sid: 'AllowSESPutObject',
+      effect: iam.Effect.ALLOW,
+      principals: [new iam.ServicePrincipal('ses.amazonaws.com')],
+      actions: ['s3:PutObject'],
+      resources: [bucket.arnForObjects('*')],
+      conditions: {
+        StringEquals: { 'aws:Referer': account_id},
+      },
+    }));
+
+    bucket.addEventNotification(
+      s3.EventType.OBJECT_CREATED_PUT,
+      new s3n.LambdaDestination(dockerFunc), { prefix: 'emails/' }
+    );
+
+    dockerFunc.addPermission('AllowS3Invoke', {
+      principal: new iam.ServicePrincipal('s3.amazonaws.com'),
+      sourceArn: bucket.bucketArn,
+    });
+    
+    const ruleSet = ses.ReceiptRuleSet.fromReceiptRuleSetName(
+      this,
+      'ImportedRuleSet',
+      'inbox2action-receipt-rule-set'
+    );
+    
+    ruleSet.addRule(`inbox2action-${props.envName}-rule`, {
+      receiptRuleName: `inbox2action-${props.envName}-rule`,
+      recipients: [props.email.address],
+      actions: [
+        new actions.S3({
+          bucket: bucket,
+          objectKeyPrefix: 'emails/',
+        }),
+      ],
+      enabled: true,
+      scanEnabled: true,
+    });
+
   }
 }
