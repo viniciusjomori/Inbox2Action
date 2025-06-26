@@ -26,7 +26,7 @@ export class Inbox2ActionStack extends cdk.Stack {
     super(scope, id, props);
 
     const dockerFunc = new lambda.DockerImageFunction(this, "DockerFunc", {
-      functionName: `inbox2action-lambda-${props.envName}`,
+      functionName: `inbox2action-${props.envName}-lambda`,
       code: lambda.DockerImageCode.fromImageAsset("./image"),
       memorySize: 1024,
       timeout: cdk.Duration.seconds(60),

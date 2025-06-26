@@ -9,7 +9,7 @@ let envName = app.node.tryGetContext('env')
 const config = getConfig(envName)
 
 new Inbox2ActionStack(app, 'Inbox2Action', {
-  stackName: `inbox2action-stack-${envName}`,
+  stackName: `inbox2action-${envName}-stack`,
   envName: envName,
   ...config
 });
