@@ -41,8 +41,7 @@ def send_email(raw_email, result, task_id):
     )
 
 async def async_hendler(event, context):
-    file = event['Records'][0]['s3']['object']['key']
-    raw_email = s3.get_content(file)
+    raw_email = s3.get_content(event)
     subject: str = rawemail.extract_subject(raw_email)
     content = rawemail.extract_content(raw_email)
     

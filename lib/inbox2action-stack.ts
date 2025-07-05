@@ -44,7 +44,6 @@ export class Inbox2ActionStack extends cdk.Stack {
       environment: {
         'USERNAME': props.username,
         'OPENAI_API_KEY': props.openai.apiKey,
-        'AWS_BUCKET_NAME': bucketName,
         'CLICKUP_API_KEY': props.clickUp.apiKey,
         'CLICKUP_TEAM_ID': props.clickUp.teamId,
         'CLICKUP_SPACE_ID': props.clickUp.spaceId,
