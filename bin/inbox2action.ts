@@ -8,7 +8,7 @@ const app = new cdk.App();
 let envName = app.node.tryGetContext('env')
 const config = getConfig(envName)
 
-new Inbox2ActionStack(app, 'Inbox2Action', {
+new Inbox2ActionStack(app, `Inbox2Action[${envName.toUpperCase()}]`, {
   stackName: `inbox2action-${envName}-stack`,
   envName: envName,
   ...config

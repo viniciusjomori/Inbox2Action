@@ -32,11 +32,8 @@ export class Inbox2ActionStack extends cdk.Stack {
     const account_id = process.env.CDK_DEFAULT_ACCOUNT
     
     const stackName = cdk.Stack.of(this);
-    const hash = crypto.createHash('md5').update(stackName.stackName).digest('hex').slice(0, 8);
     
-    const bucketName = `inbox2action-${props.envName}-bucket-${hash}`
-    
-    const dockerFunc = new lambda.DockerImageFunction(this, "DockerFunc", {
+    const dockerLambda = new lambda.DockerImageFunction(this, "DockerLambda", {
       functionName: `inbox2action-${props.envName}-lambda`,
       code: lambda.DockerImageCode.fromImageAsset("./image"),
       memorySize: 1024,
@@ -54,7 +51,7 @@ export class Inbox2ActionStack extends cdk.Stack {
       }
     });
 
-    dockerFunc.addToRolePolicy(new iam.PolicyStatement({
+    dockerLambda.addToRolePolicy(new iam.PolicyStatement({
       actions: ['ses:SendEmail', 'ses:SendRawEmail'],
       resources: ['*'],
       conditions: {
@@ -64,14 +61,15 @@ export class Inbox2ActionStack extends cdk.Stack {
       }
     }));
     
-    const bucket = new s3.Bucket(this, bucketName, {
-      bucketName: bucketName,
+    const hash = crypto.createHash('md5').update(stackName.stackName).digest('hex').slice(0, 8);
+    const bucket = new s3.Bucket(this, 'S3Bucket', {
+      bucketName: `inbox2action-${props.envName}-bucket-${hash}`,
       versioned: false,
       removalPolicy: cdk.RemovalPolicy.DESTROY,
       autoDeleteObjects: true
     });
     
-    bucket.grantRead(dockerFunc, 'emails/*');
+    bucket.grantRead(dockerLambda, 'emails/*');
     
     bucket.addToResourcePolicy(new iam.PolicyStatement({
       sid: 'AllowSESPutObject',
@@ -86,10 +84,10 @@ export class Inbox2ActionStack extends cdk.Stack {
 
     bucket.addEventNotification(
       s3.EventType.OBJECT_CREATED_PUT,
-      new s3n.LambdaDestination(dockerFunc), { prefix: 'emails/' }
+      new s3n.LambdaDestination(dockerLambda), { prefix: 'emails/' }
     );
 
-    dockerFunc.addPermission('AllowS3Invoke', {
+    dockerLambda.addPermission('AllowS3Invoke', {
       principal: new iam.ServicePrincipal('s3.amazonaws.com'),
       sourceArn: bucket.bucketArn,
     });
