@@ -5,7 +5,8 @@ import * as s3 from 'aws-cdk-lib/aws-s3';
 import * as ses from 'aws-cdk-lib/aws-ses';
 import * as actions from 'aws-cdk-lib/aws-ses-actions';
 import * as iam from 'aws-cdk-lib/aws-iam';
-import * as s3n from 'aws-cdk-lib/aws-s3-notifications';
+import * as sns from 'aws-cdk-lib/aws-sns';
+import * as subscriptions from 'aws-cdk-lib/aws-sns-subscriptions';
 import * as crypto from 'crypto';
 
 export interface Inbox2ActionProps extends cdk.StackProps {
@@ -50,7 +51,7 @@ export class Inbox2ActionStack extends cdk.Stack {
         'EMAIL_ADDRESS_BCC': props.email.bcc,
       }
     });
-
+    
     dockerLambda.addToRolePolicy(new iam.PolicyStatement({
       actions: ['ses:SendEmail', 'ses:SendRawEmail'],
       resources: ['*'],
@@ -60,6 +61,13 @@ export class Inbox2ActionStack extends cdk.Stack {
         }
       }
     }));
+
+    const snsTopic = new sns.Topic(this, 'SnsTopic', {
+      topicName: `inbox2action-${props.envName}-sns-topic`,
+      displayName: `inbox2action-${props.envName}-sns-topic`
+    })
+
+    snsTopic.addSubscription(new subscriptions.LambdaSubscription(dockerLambda));
     
     const hash = crypto.createHash('md5').update(stackName.stackName).digest('hex').slice(0, 8);
     const bucket = new s3.Bucket(this, 'S3Bucket', {
@@ -82,11 +90,6 @@ export class Inbox2ActionStack extends cdk.Stack {
       },
     }));
 
-    bucket.addEventNotification(
-      s3.EventType.OBJECT_CREATED_PUT,
-      new s3n.LambdaDestination(dockerLambda), { prefix: 'emails/' }
-    );
-
     dockerLambda.addPermission('AllowS3Invoke', {
       principal: new iam.ServicePrincipal('s3.amazonaws.com'),
       sourceArn: bucket.bucketArn,
@@ -105,7 +108,8 @@ export class Inbox2ActionStack extends cdk.Stack {
         new actions.S3({
           bucket: bucket,
           objectKeyPrefix: 'emails/',
-        }),
+          topic: snsTopic
+        })
       ],
       enabled: true,
       scanEnabled: true,

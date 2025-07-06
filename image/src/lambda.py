@@ -23,8 +23,7 @@ def extract_attachs(raw_email, content):
     file = File('email.html', content)
     directory.create_file(file, '/tmp/attachs')
 
-def send_email(raw_email, result, task_id):
-    email = rawemail.extract_sender(raw_email)
+def send_email(email, result, task_id):
     content = html.create_task_table(
         id=task_id,
         name=result.output.name,
@@ -41,8 +40,10 @@ def send_email(raw_email, result, task_id):
     )
 
 async def async_hendler(event, context):
-    raw_email = s3.get_content(event)
-    subject: str = rawemail.extract_subject(raw_email)
+    message = json.loads(event['Records'][0]['Sns']['Message'])
+
+    raw_email = s3.from_sns(message)
+    subject = message['mail']['commonHeaders']['subject']
     content = rawemail.extract_content(raw_email)
     
     extract_attachs(raw_email, content)
@@ -61,8 +62,9 @@ async def async_hendler(event, context):
         list_id = result.output.list.id
     )
 
+    sender = message['mail']['commonHeaders']['returnPath']
     send_email(
-        raw_email=raw_email,
+        email=sender,
         result=result,
         task_id=task_id,
     )
