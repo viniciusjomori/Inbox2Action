@@ -20,7 +20,8 @@ export interface Inbox2ActionProps extends cdk.StackProps {
   email: {
     address: string;
     name: string;
-    bcc: string
+    bcc: string;
+    receiptRuleSet: string
   }
 }
 
@@ -96,7 +97,7 @@ export class Inbox2ActionStack extends cdk.Stack {
     const ruleSet = ses.ReceiptRuleSet.fromReceiptRuleSetName(
       this,
       'ImportedRuleSet',
-      'inbox2action-receipt-rule-set'
+      props.email.receiptRuleSet
     );
     
     ruleSet.addRule(`inbox2action-${props.envName}-rule`, {
