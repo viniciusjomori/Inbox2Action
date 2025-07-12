@@ -30,9 +30,8 @@ export class Inbox2ActionStack extends cdk.Stack {
   constructor(scope: Construct, id: string, props: Inbox2ActionProps) {
     super(scope, id, props);
 
-    const account_id = process.env.CDK_DEFAULT_ACCOUNT
-    
-    const stackName = cdk.Stack.of(this);
+    const account_id = cdk.Stack.of(this).account
+    const hash = crypto.createHash('md5').update(account_id).digest('hex').slice(0, 8);
     
     const dockerLambda = new lambda.DockerImageFunction(this, "DockerLambda", {
       functionName: `inbox2action-${props.envName}-lambda`,
@@ -69,7 +68,6 @@ export class Inbox2ActionStack extends cdk.Stack {
 
     snsTopic.addSubscription(new subscriptions.LambdaSubscription(dockerLambda));
     
-    const hash = crypto.createHash('md5').update(stackName.stackName).digest('hex').slice(0, 8);
     const bucket = new s3.Bucket(this, 'S3Bucket', {
       bucketName: `inbox2action-${props.envName}-bucket-${hash}`,
       versioned: false,
