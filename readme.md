@@ -5,8 +5,8 @@
 ## Como funciona:
 
 1. O domínio de e-mail deve ter os registros **TXT**, **MX** e **DKIM** configurados conforme os requisitos da AWS.
-2. Dessa forma, será possível registrar uma regra de recebimento no **AWS Simple Email Service (SES)**. Seu papel é armazenar as mensagens recebidas por um endereço específico em um **Bucket do S3**.
-3. Após o salvamento do arquivo, uma **AWS Lambda**, em **Python**, é disparada. A função utiliza a biblioteca **boto3** para ler o e-mail, envia seu conteúdo para a **API da OpenAI** e recebe uma tarefa estruturada, com nome, descrição, prazo e prioridade. Com esses dados, o sistema usa a **API do ClickUp** para cadastrar o registro.
+2. Dessa forma, será possível registrar uma regra de recebimento no **AWS Simple Email Service (SES)**. Seu papel é armazenar as mensagens recebidas por um endereço específico em um **Bucket do S3** e publica uma mensagem em um tópico do **Simple Notification Service (SNS)**.
+3. Após o salvamento do arquivo, uma **AWS Lambda**, em **Python**, é disparada via SNS. A função utiliza a biblioteca **boto3** para ler o e-mail, envia seu conteúdo para a **API da OpenAI** e recebe uma tarefa estruturada, com nome, descrição, prazo e prioridade. Com esses dados, o sistema usa a **API do ClickUp** para cadastrar o registro.
 
 ## Resultado:
 
@@ -19,6 +19,8 @@ Um fluxo inteligente que transforma e-mails em tarefas organizadas de acordo com
 * **Python**: Linguagem principal utilizada na imagem da AWS Lambda, a qual define todo o *core* do projeto.
 
 * **Amazon Simple Email Service (SES)**: Utilizado para receber e-mails. Através de uma regra de recebimento, os e-mails são armazenados em um bucket do S3.
+
+* **Amazon Simple Notification Service (SNS)**: Atua como intermediário entre o SES e a Lambda. Após o recebimento e armazenamento do e-mail no S3, o SES publica uma mensagem ao tópico SNS, que por sua vez aciona a função Lambda responsável por processar o conteúdo da mensagem.
 
 * **AWS S3**: Armazena os e-mails recebidos pelo SES em formato `.eml`, que são posteriormente lidos pela Lambda.
 
