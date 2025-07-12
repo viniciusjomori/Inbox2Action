@@ -34,4 +34,4 @@ Um fluxo inteligente que transforma e-mails em tarefas organizadas de acordo com
 
 * **boto3**: Biblioteca oficial da AWS para Python, utilizada para interagir com os serviços S3 e SES dentro da função Lambda.
 
-* **Docker**: Empregado para empacotar e testar localmente a função Lambda com todas as dependências necessárias antes de fazer o deploy.
+* **Docker**: Utilizado para configurar o ambiente da função Lambda, permitindo a inclusão de pacotes externos e bibliotecas nativas que não estão disponíveis no ambiente padrão da AWS.
