@@ -15,7 +15,7 @@ new Inbox2ActionStack(app, `Inbox2Action[${envName.toUpperCase()}]`, {
 });
 
 function getConfig(envName: string) {
-  const configPath = path.resolve(__dirname, `../config/${envName}.json`);
+  const configPath = path.resolve(__dirname, `../env/${envName}.json`);
   
   if (!fs.existsSync(configPath)) throw new Error(`env not found: ${configPath}`);
 
