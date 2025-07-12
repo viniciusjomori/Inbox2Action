@@ -10,6 +10,8 @@
 
 ## Resultado:
 
+[Clique aqui para assistir](https://www.youtube.com/watch?v=dOFVlCA9mD4)
+
 Um fluxo inteligente que transforma e-mails em tarefas organizadas de acordo com sua prioridade. Com isso, diminuímos o ruído da caixa de entrada e favorecemos a gestão de tempo e tomada de decisão.
 
 ## Tecnologias
