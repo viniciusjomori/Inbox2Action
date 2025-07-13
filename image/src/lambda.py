@@ -2,13 +2,12 @@ import asyncio
 import json
 
 from src.agents.task_agent import task_agent
-from src.util import html, rawemail, directory
-from src.util.directory import File
+from src.util import html, rawemail
 from src.aws import s3, ses
 from src.service import clickup
 
-def extract_attachs(raw_email, content):
-    rawemail.extract_attachs(raw_email, path='/tmp/attachs')
+def attach_files(task_id, raw_email, content):
+    attachs: list = rawemail.extract_attachs(raw_email)
 
     if content['text/html']:
         content = content['text/html']
@@ -20,8 +19,10 @@ def extract_attachs(raw_email, content):
     else:
         content = content['text/plain']
 
-    file = File('email.html', content)
-    directory.create_file(file, '/tmp/attachs')
+    attachs.append(('email.html', content))
+    
+    for filename, bytes in attachs:
+        clickup.attach_file(task_id, filename, bytes)
 
 def send_email(email, result, task_id):
     content = html.create_task_table(
@@ -46,8 +47,6 @@ async def async_hendler(event, context):
     subject = message['mail']['commonHeaders']['subject']
     content = rawemail.extract_content(raw_email)
     
-    extract_attachs(raw_email, content)
-
     result = await task_agent.run(json.dumps({
         'subject': subject,
         'content': content['text/plain'][:3000]
@@ -61,6 +60,8 @@ async def async_hendler(event, context):
         due_date = result.output.due_date,
         list_id = result.output.list.id
     )
+    
+    attach_files(task_id, raw_email, content)
 
     sender = message['mail']['commonHeaders']['returnPath']
     send_email(

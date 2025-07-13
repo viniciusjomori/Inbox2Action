@@ -1,9 +1,9 @@
 from typing import Literal
 from src.util.https import HttpClient
-from src.util import directory
 
 from datetime import datetime
 import os
+import io
 
 api_key = os.getenv('CLICKUP_API_KEY')
 
@@ -46,16 +46,11 @@ def create_task(
         }
     )
 
-    task_id = response.body['id']
-
     if response.status != 200:
         print(response.body)
         raise Exception('Erro ao criar tarefa!')
     
-    for file in directory.ls_files('/tmp/attachs'):
-        attach(task_id, file)
-    
-    return task_id
+    return response.body['id']
 
 def get_lists(space_id, archived=False):
     response = http_client.get(
@@ -65,9 +60,15 @@ def get_lists(space_id, archived=False):
 
     return response.body['lists']
 
-def attach(task_id, filename):
+def attach_file(task_id, filename, content):
+    if isinstance(content, str):
+        content = content.encode('utf-8')
+
+    file_stream = io.BytesIO(content)
+    file_stream.name = filename
+
     http_client.post(
         f'task/{task_id}/attachment',
         headers={"content-type": None},
-        files={"attachment": (filename, open(f'/tmp/attachs/{filename}', "rb"))}
+        files={"attachment": (filename, file_stream)}
     )

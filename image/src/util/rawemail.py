@@ -4,6 +4,7 @@ from email import policy
 from email.parser import BytesParser
 from io import BytesIO
 from email.utils import parseaddr
+from typing import Tuple
 
 from src.util import directory
 from src.util.directory import File
@@ -30,18 +31,20 @@ def extract_content(raw_email: str):
 
     return content
 
-def extract_attachs(raw_email: str, path='/tmp'):
+def extract_attachs(raw_email: str) -> list[Tuple]:
+    attachs = []
+    
     raw_bytes = raw_email.encode('utf-8')
     msg = BytesParser(policy=policy.default).parse(BytesIO(raw_bytes))
 
     for part in msg.iter_attachments():
         content_disposition = part.get_content_disposition()
         if content_disposition == 'attachment':
-            attach = File(
-                name=part.get_filename(),
-                content=part.get_payload(decode=True)
-            )
-            directory.create_file(attach, path)
+            attachs.append((
+                part.get_filename(),
+                part.get_payload(decode=True)
+            ))
+    return attachs
 
 def extract_subject(raw_email: str) -> str:
     msg = message_from_string(raw_email, policy=default)
