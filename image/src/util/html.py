@@ -20,7 +20,7 @@ def create_task_table(
                 </tr>
                 <tr style="background-color: #f9f9f9;">
                     <td style="padding: 8px 0; font-weight: bold; vertical-align: middle;">Prioridade</td>
-                    <td style="padding: 8px 0; vertical-align: middle;">{priority}</td>
+                    <td style="padding: 8px 0; vertical-align: middle;">{priority.capitalize()}</td>
                 </tr>
                 <tr>
                     <td style="padding: 8px 0; font-weight: bold; vertical-align: middle;">Prazo</td>
