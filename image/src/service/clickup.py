@@ -1,9 +1,9 @@
 from typing import Literal
-from src.util.https import HttpClient
-
 from datetime import datetime
 import os
 import io
+
+from src.util.https import HttpClient
 
 api_key = os.getenv('CLICKUP_API_KEY')
 
@@ -17,19 +17,19 @@ priority_map = {
 http_client = HttpClient(
     base='https://api.clickup.com/api/v2/',
     headers={
-        "accept": "application/json",
-        "content-type": "application/json",
+        "Accept": "application/json",
+        "Content-Type": "application/json",
         "Authorization": api_key
     } 
 )
 
 def create_task(
-        name: str,
-        description: str,
-        tags: list,
-        priority: Literal['baixa', 'normal', 'alta', 'urgente'],
-        due_date: datetime,
-        list_id: str
+    name: str,
+    description: str,
+    tags: list,
+    priority: Literal['baixa', 'normal', 'alta', 'urgente'],
+    due_date: datetime,
+    list_id: str
 ):
 
     priority = priority_map[priority]
@@ -55,6 +55,7 @@ def create_task(
 def get_lists(space_id, archived=False):
     response = http_client.get(
         endpoint=f'space/{space_id}/list',
+        headers={"Content-Type": ""},
         params={'archived': archived}
     )
 
@@ -69,6 +70,6 @@ def attach_file(task_id, filename, content):
 
     http_client.post(
         f'task/{task_id}/attachment',
-        headers={"content-type": None},
+        headers={"Content-Type": None},
         files={"attachment": (filename, file_stream)}
     )

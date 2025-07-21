@@ -15,19 +15,19 @@ class HttpClient:
     def get(self, endpoint, headers={}, params={}):
         return self.request('GET', endpoint, headers=headers, params=params)
 
-    def post(self, endpoint, body=None, headers={}, params={}, files={}):
-        return self.request('POST', endpoint, body=body, headers=headers, params=params, files=files)
+    def post(self, endpoint, headers={}, params={}, body=None, files={}):
+        return self.request('POST', endpoint, headers=headers, params=params, body=body, files=files)
 
-    def put(self, endpoint, body=None, headers={}, params={}):
-        return self.request('PUT', endpoint, body=body, headers=headers, params=params)
+    def put(self, endpoint, headers={}, params={}, body=None):
+        return self.request('PUT', endpoint, headers=headers, params=params, body=body)
 
     def delete(self, endpoint, headers={}, params={}):
         return self.request('DELETE', endpoint, headers=headers, params=params)
     
-    def patch(self, endpoint, body=None, headers={}, params={}):
-        return self.request('PATCH', endpoint, body=body, headers=headers, params=params)
+    def patch(self, endpoint, headers={}, params={}, body=None):
+        return self.request('PATCH', endpoint, headers=headers, params=params, body=body)
 
-    def request(self, method, endpoint, body=None, headers={}, params={}, files={}):
+    def request(self, method, endpoint, headers={}, params={}, body=None, files={}):
         url = f'{self.base}{endpoint}'
 
         headers = self.headers | headers
@@ -40,6 +40,7 @@ class HttpClient:
             json=body,
             files=files,
         )
+
         status = response.status_code
 
         try:
