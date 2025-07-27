@@ -1,5 +1,10 @@
 import asyncio
 import json
+import logging
+import os
+
+logger = logging.getLogger()
+logger.setLevel(os.getenv("LOG_LEVEL", "INFO").upper())
 
 from src.agents.task_agent import task_agent
 from src.util import html, rawemail
@@ -43,15 +48,20 @@ def send_email(email, result, task_id):
 async def async_hendler(event, context):
     message = json.loads(event['Records'][0]['Sns']['Message'])
 
+    logging.info("Fetching s3 object from SNS message...")
     raw_email = s3.from_sns(message)
+
+    logging.info("Extracting subject and content from raw email..")
     subject = message['mail']['commonHeaders']['subject']
     content = rawemail.extract_content(raw_email)
     
+    logging.info("Forwarding email content to AI Agent...")
     result = await task_agent.run(json.dumps({
         'subject': subject,
         'content': content['text/plain'][:3000]
     }))
 
+    logging.info("Posting task into ClickUp API...")
     task_id = clickup.create_task(
         name = result.output.name,
         description = result.output.description,
@@ -61,11 +71,12 @@ async def async_hendler(event, context):
         list_id = result.output.list.id
     )
     
+    logging.info("Uploading attachments to ClickUp task...")
     attach_files(task_id, raw_email, content)
 
-    sender = message['mail']['commonHeaders']['returnPath']
+    logging.info("Sending confirmation email...")
     send_email(
-        email=sender,
+        email=message['mail']['commonHeaders']['returnPath'],
         result=result,
         task_id=task_id,
     )
@@ -84,4 +95,11 @@ async def async_hendler(event, context):
     }
 
 def handler(event, context):
-    return asyncio.run(async_hendler(event, context))
+    logging.info("Lambda execution start")
+    logging.info("Lambda event payload: %s", event)
+
+    res = asyncio.run(async_hendler(event, context))
+    logging.info("Lambda execution complete")
+    logging.info("Lambda response: %s", res)
+    
+    return res

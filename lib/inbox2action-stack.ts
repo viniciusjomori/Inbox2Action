@@ -23,7 +23,8 @@ export interface Inbox2ActionProps extends cdk.StackProps {
     name: string;
     bcc: string;
     receiptRuleSet: string
-  }
+  },
+  log: { level: string }
 }
 
 export class Inbox2ActionStack extends cdk.Stack {
@@ -39,6 +40,7 @@ export class Inbox2ActionStack extends cdk.Stack {
       memorySize: 1024,
       timeout: cdk.Duration.seconds(60),
       architecture: lambda.Architecture.X86_64,
+      loggingFormat: lambda.LoggingFormat.JSON,
       environment: {
         'USERNAME': props.username,
         'OPENAI_API_KEY': props.openai.apiKey,
@@ -48,6 +50,7 @@ export class Inbox2ActionStack extends cdk.Stack {
         'EMAIL_NAME': props.email.name,
         'EMAIL_ADDRESS': props.email.address,
         'EMAIL_ADDRESS_BCC': props.email.bcc,
+        'LOG_LEVEL': props.log.level
       }
     });
     
