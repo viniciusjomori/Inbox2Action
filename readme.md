@@ -14,6 +14,70 @@
 
 Um fluxo inteligente que transforma e-mails em tarefas organizadas de acordo com sua prioridade. Com isso, diminuímos o ruído da caixa de entrada e favorecemos a gestão de tempo e tomada de decisão.
 
+## Deploy
+
+### 1. Domínio
+* Compre um domínio
+* Crie uma identidade no Amazon SES
+* Configure o TXT, MX e DKIM de acordo com as informações passadas pela AWS
+
+### 2. ClickUp
+* Abra uma conta no ClickUp
+* Crie um espaço, listas e adicione uma descrição nas listas. O Inbox2Action usará essas descrições para determinar o local correto para cadastro da tarefa
+* Copie a url do site para obter o ID do espaço e ID do time: `https://app.clickup.com/{teamId}/v/o/s/{spaceId}`
+* Adquira a chave de API do ClickUp
+
+### 3. OpenAi
+* Abra uma conta na OpenAi e compre créditos
+* Adquira a chave de API da OpenAI
+
+### 4. Grupo de Regra de Recebimento de Email
+* Na Console da AWS, no serviço Amazon Simple Email Service (SES), crie um grupo de regra de recebimento de e-mail
+* Habilite o grupo
+
+### 5. AWS CLI
+* Instale a `AWS CLI`
+* Crie um usuário no IAM e adquira suas chaves
+* No terminal, execute o comando `aws configure`, para realizar a autenticação e escolher em qual região ocorrerá o deploy
+
+### 6. Configuração de ambiente
+* Na raiz do projeto, crie um diretório chamado `env`
+* Nesse diretório, crie um arquivo `.json`. O nome do arquivo será o nome do ambiente: `env/dev.json`
+* No Json, coloque essas informações:
+
+```
+{
+    "username": "Seu nome",
+    "openai": {
+        "apiKey": "Chave de API da OpenAI"
+    },
+    "clickUp": {
+        "apiKey": "Chave de API do ClickUp",
+        "teamId": "ID do time",
+        "spaceId": "ID do espaço"
+    },
+    "email": {
+        "receiptRuleSet": "Nome do grupo de regra para recebimento de e-mail",
+        "address": "Endereço de e-mail a receber as tarefas",
+        "name": "Nome do remetente para enviar as mensagens de confirmação",
+        "bcc": "Endereço de e-mail a receber todas as mensagens da aplicação (em cópia oculta)"
+    },
+    "log": {
+        "level": "Nível de log a ser exibido no CloudWatch. Escolha um entre 'CRITICAL', 'ERROR', 'WARNING', 'INFO' e 'DEBUG'"
+    }
+}
+```
+
+### 7. Docker
+* Instale o Docker
+* Inicie o Docker Desktop
+
+### 8. CDK
+* Instale o `Node.js` e `AWS CDK`
+* Caso seja sua primeira vez usando CDK, execute o comando `cdk bootstrap`, para instanciar os recursos padrão
+* Execute o comando `cdk diff`, para visualizar os recursos a serem criados para o projeto
+* Após seguir todos os passos anteriores, execute o comando `cdk deploy --require-approval never`, para criar todos os recursos e colocar a aplicação em produção
+
 ## Tecnologias
 
 * **AWS Lambda**: Serviço de computação serverless da AWS usado para executar automaticamente a função que processa o e-mail salvo no S3.
