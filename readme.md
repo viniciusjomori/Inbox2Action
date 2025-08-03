@@ -26,6 +26,8 @@ Um fluxo inteligente que transforma e-mails em tarefas organizadas de acordo com
 
 * **AWS S3**: Armazena os e-mails recebidos pelo SES em formato `.eml`, que são posteriormente lidos pela Lambda.
 
+* **AWS CloudWatch**: Serviço de monitoramento da AWS, usada para armazenar e visualizar os logs da função Lambda. Integrado com a lib `logging` do Python.
+
 * **DNS (TXT, MX, DKIM)**: Configurações de autenticação de domínio necessárias para que o SES possa receber e-mails de forma segura e confiável.
 
 * **CDK (TypeScript)**: Utilizado para provisionar toda a infraestrutura AWS do projeto, através de IoC (Infrastructure as Code).
