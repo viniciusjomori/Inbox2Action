@@ -8,10 +8,10 @@ from src.util.https import HttpClient
 api_key = os.getenv('CLICKUP_API_KEY')
 
 priority_map = {
-    'baixa': 4,
-    'normal': 3,
-    'alta': 2,
-    'urgente': 1
+    4: 'Baixa',
+    3: 'Normal',
+    2: 'Alta',
+    1: 'Urgente',
 }
 
 http_client = HttpClient(
@@ -27,12 +27,11 @@ def create_task(
     name: str,
     description: str,
     tags: list,
-    priority: Literal['baixa', 'normal', 'alta', 'urgente'],
+    priority: Literal[4, 3, 2, 1],
     due_date: datetime,
     list_id: str
 ):
 
-    priority = priority_map[priority]
     due_date = int(due_date.timestamp()) * 1000
 
     response = http_client.post(
