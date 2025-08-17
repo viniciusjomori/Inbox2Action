@@ -9,6 +9,10 @@ from src.service import clickup
 
 username = os.getenv("USERNAME")
 
+space_id = os.getenv('CLICKUP_SPACE_ID')
+lists = clickup.get_lists(space_id)
+lists = [{'id': l['id'], 'name': l['name'], 'description': l['content']} for l in lists]
+
 system_prompt = f"""
 # Agente de Tarefas
 
@@ -44,18 +48,12 @@ class Task(BaseModel):
         default=1,
     )
     tags: list[str] = Field(description='Tags da tarefa')
-    list: List = Field(description='Lista a qual a tarefa pertence')
+    list: List = Field(
+        description=f'Lista a qual a tarefa pertence. As listas disponíveis são: {json.dumps(lists)}'
+    )
 
 task_agent = Agent(
     model='openai:gpt-4o',
     system_prompt=system_prompt,
     output_type=Task
 )
-
-@task_agent.system_prompt
-def context_list() -> str:
-    space_id = os.getenv('CLICKUP_SPACE_ID')
-    lists = clickup.get_lists(space_id)
-
-    lists = [{'id': l['id'], 'name': l['name'], 'description': l['content']} for l in lists]
-    return f"Você deve escolher uma lista para a tarefa. As listas disponíveis são: {json.dumps(lists)}"
