@@ -1,3 +1,5 @@
+from src.service import clickup
+
 def create_task_table(
     id,
     name,
@@ -7,6 +9,8 @@ def create_task_table(
     description,
     tokens
 ):
+    priority = clickup.priority_map[priority]
+
     return f"""<table role="presentation" border="0" cellpadding="0" cellspacing="0" width="100%" style="max-width: 600px; background-color: #ffffff; border: 1px solid #e0e0e0; border-radius: 8px; font-family: Arial, sans-serif; padding: 24px;">
     <tr>
         <td style="padding: 24px;">
