@@ -24,7 +24,6 @@ Prefira tarefas **direcionadas a mim**; se não houver, então escolha tarefas *
 
 ## Observações:
 - Ignore saudações, rodapés e informações irrelevantes à execução da tarefa.
-- Se o prazo não for especificado, considere como a data de hoje
 - Horário atual: {datetime.now()}
 - Dia da semana: {datetime.now().strftime('%A')}
 """
@@ -36,7 +35,10 @@ class List(BaseModel):
 class Task(BaseModel):
     name: str = Field(description='Nome da tarefa. É um resumo em poucas palavras do que deve ser feito')
     description: str = Field(description='Descrição da Tarefa.')
-    due_date: datetime = Field(description='Data de vencimento da tarefa')
+    due_date: datetime = Field(
+        description='Data da tarefa. Se não informado, será a data atual',
+        default=datetime.now(),
+    )
     priority: Literal[1, 2, 3, 4] = Field(
         description='Prioridade da tarefa. Quanto menor, mais importante. Se não informado, será 1',
         default=1,
