@@ -42,7 +42,7 @@ Um fluxo inteligente que transforma e-mails em tarefas organizadas de acordo com
 
 ### 6. Configuração de ambiente
 * Na raiz do projeto, crie um diretório chamado `env`
-* Nesse diretório, crie um arquivo `.json`. O nome do arquivo será o nome do ambiente: `env/dev.json`
+* Nesse diretório, crie um arquivo `.json`. O nome do arquivo será o nome do ambiente. Exemplo: `env/dev.json` -> "*dev*" é o nome do ambiente
 * No Json, coloque essas informações:
 
 ```
@@ -76,7 +76,7 @@ Um fluxo inteligente que transforma e-mails em tarefas organizadas de acordo com
 * Instale o `Node.js` e `AWS CDK`
 * Caso seja sua primeira vez usando CDK, execute o comando `cdk bootstrap`, para instanciar os recursos padrão
 * Execute o comando `cdk diff`, para visualizar os recursos a serem criados para o projeto
-* Após seguir todos os passos anteriores, execute o comando `cdk deploy --require-approval never`, para criar todos os recursos e colocar a aplicação em produção
+* Após seguir todos os passos anteriores, execute o comando `cdk deploy -c env=dev --require-approval never`, para criar todos os recursos e colocar a aplicação em produção. Substitua o parâmetro "*dev*" pelo nome do ambiente.
 
 ## Tecnologias
 
