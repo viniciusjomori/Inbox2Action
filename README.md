@@ -84,11 +84,11 @@ Um fluxo inteligente que transforma e-mails em tarefas organizadas de acordo com
 
 * **Python**: Linguagem principal utilizada na imagem da AWS Lambda, a qual define todo o *core* do projeto.
 
-* **Amazon Simple Email Service (SES)**: Utilizado para receber e-mails. Através de uma regra de recebimento, os e-mails são armazenados em um bucket do S3.
+* **Amazon SES (Simple Email Service)**: Utilizado para receber e-mails. Através de uma regra de recebimento, os e-mails são armazenados em um bucket do S3.
 
-* **Amazon Simple Notification Service (SNS)**: Atua como intermediário entre o SES e a Lambda. Após o recebimento e armazenamento do e-mail no S3, o SES publica uma mensagem ao tópico SNS, que por sua vez aciona a função Lambda responsável por processar o conteúdo da mensagem.
+* **Amazon SNS (Simple Notification Service)**: Atua como intermediário entre o SES e a Lambda. Após o recebimento e armazenamento do e-mail no S3, o SES publica uma mensagem ao tópico SNS, que por sua vez aciona a função Lambda responsável por processar o conteúdo da mensagem.
 
-* **AWS S3**: Armazena os e-mails recebidos pelo SES em formato `.eml`, que são posteriormente lidos pela Lambda.
+* **AWS S3 (Simple Storage Service)**: Armazena os e-mails recebidos pelo SES em formato `.eml`, que são posteriormente lidos pela Lambda.
 
 * **AWS CloudWatch**: Serviço de monitoramento da AWS, usada para armazenar e visualizar os logs da função Lambda. Integrado com a lib `logging` do Python.
 
