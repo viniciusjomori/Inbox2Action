@@ -4,7 +4,7 @@ import os
 name = os.getenv('EMAIL_NAME')
 address = os.getenv('EMAIL_ADDRESS')
 bcc = os.getenv('EMAIL_ADDRESS_BCC')
-bcc = bcc.split(', ')
+bcc = bcc.split(',')
 
 ses_client = boto3.client('ses', region_name='us-east-1')
 
