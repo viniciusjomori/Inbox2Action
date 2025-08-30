@@ -24,6 +24,7 @@ export interface Inbox2ActionProps extends cdk.StackProps {
     bcc: string;
     receiptRuleSet: string
   },
+  task: { contextSize: number },
   log: { level: string }
 }
 
@@ -119,6 +120,7 @@ function getEnviromentObject(props: Inbox2ActionProps) {
         'EMAIL_NAME': props.email.name,
         'EMAIL_ADDRESS': props.email.address,
         'EMAIL_ADDRESS_BCC': props.email.bcc,
-        'LOG_LEVEL': props.log.level
+        'TASK_CONTEXT_SIZE': props.task.contextSize.toString(),
+        'LOG_LEVEL': props.log.level,
       }
 }

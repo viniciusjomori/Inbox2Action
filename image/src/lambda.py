@@ -11,6 +11,8 @@ from src.util import html, rawemail
 from src.aws import s3, ses
 from src.service import clickup
 
+context_size = int(os.getenv('TASK_CONTEXT_SIZE', 3000))
+
 def attach_files(task_id, raw_email, content):
     attachs: list = rawemail.extract_attachs(raw_email)
 
@@ -55,10 +57,10 @@ async def async_hendler(event, context):
     subject = message['mail']['commonHeaders']['subject']
     content = rawemail.extract_content(raw_email)
     
-    logging.info("Forwarding email content to AI Agent...")
+    logging.info(f"Forwarding email content to AI Agent (context size: {context_size})...")
     result = await task_agent.run(json.dumps({
         'subject': subject,
-        'content': content['text/plain'][:3000]
+        'content': content['text/plain'][:context_size]
     }))
 
     logging.info("Posting task into ClickUp API...")
