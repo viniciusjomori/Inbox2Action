@@ -41,17 +41,7 @@ export class Inbox2ActionStack extends cdk.Stack {
       timeout: cdk.Duration.seconds(60),
       architecture: lambda.Architecture.X86_64,
       loggingFormat: lambda.LoggingFormat.JSON,
-      environment: {
-        'USERNAME': props.username,
-        'OPENAI_API_KEY': props.openai.apiKey,
-        'CLICKUP_API_KEY': props.clickUp.apiKey,
-        'CLICKUP_TEAM_ID': props.clickUp.teamId,
-        'CLICKUP_SPACE_ID': props.clickUp.spaceId,
-        'EMAIL_NAME': props.email.name,
-        'EMAIL_ADDRESS': props.email.address,
-        'EMAIL_ADDRESS_BCC': props.email.bcc,
-        'LOG_LEVEL': props.log.level
-      }
+      environment: getEnviromentObject(props)
     });
     
     dockerLambda.addToRolePolicy(new iam.PolicyStatement({
@@ -117,4 +107,18 @@ export class Inbox2ActionStack extends cdk.Stack {
     });
 
   }
+}
+
+function getEnviromentObject(props: Inbox2ActionProps) {
+  return {
+        'USERNAME': props.username,
+        'OPENAI_API_KEY': props.openai.apiKey,
+        'CLICKUP_API_KEY': props.clickUp.apiKey,
+        'CLICKUP_TEAM_ID': props.clickUp.teamId,
+        'CLICKUP_SPACE_ID': props.clickUp.spaceId,
+        'EMAIL_NAME': props.email.name,
+        'EMAIL_ADDRESS': props.email.address,
+        'EMAIL_ADDRESS_BCC': props.email.bcc,
+        'LOG_LEVEL': props.log.level
+      }
 }
