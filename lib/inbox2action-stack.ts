@@ -32,6 +32,13 @@ export class Inbox2ActionStack extends cdk.Stack {
   constructor(scope: Construct, id: string, props: Inbox2ActionProps) {
     super(scope, id, props);
 
+    setTags(this, {
+      'Project': 'Inbox2Action',
+      'Enviroment': props.envName,
+      'CreatedBy': 'AWS CDK',
+      'UpdateDate': new Date().toISOString()
+    })
+
     const account_id = cdk.Stack.of(this).account
     const hash = crypto.createHash('md5').update(account_id).digest('hex').slice(0, 8);
     
@@ -107,6 +114,12 @@ export class Inbox2ActionStack extends cdk.Stack {
       scanEnabled: true,
     });
 
+  }
+}
+
+function setTags(stack: cdk.Stack, tags: Object) {
+  for (const [key, value] of Object.entries(tags)) {
+    cdk.Tags.of(stack).add(key, value);
   }
 }
 
