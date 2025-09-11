@@ -32,7 +32,7 @@ export class Inbox2ActionStack extends cdk.Stack {
   constructor(scope: Construct, id: string, props: Inbox2ActionProps) {
     super(scope, id, props);
 
-    setTags(this, {
+    this.setTags({
       'Project': 'Inbox2Action',
       'Enviroment': props.envName,
       'CreatedBy': 'AWS CDK',
@@ -113,27 +113,27 @@ export class Inbox2ActionStack extends cdk.Stack {
       enabled: true,
       scanEnabled: true,
     });
-
   }
-}
 
-function setTags(stack: cdk.Stack, tags: Object) {
-  for (const [key, value] of Object.entries(tags)) {
-    cdk.Tags.of(stack).add(key, value);
+  private setTags(tags: Object) {
+    for (const [key, value] of Object.entries(tags)) {
+      cdk.Tags.of(this).add(key, value);
+    }
   }
+
 }
 
 function getEnviromentObject(props: Inbox2ActionProps) {
   return {
-        'USERNAME': props.username,
-        'OPENAI_API_KEY': props.openai.apiKey,
-        'CLICKUP_API_KEY': props.clickUp.apiKey,
-        'CLICKUP_TEAM_ID': props.clickUp.teamId,
-        'CLICKUP_SPACE_ID': props.clickUp.spaceId,
-        'EMAIL_NAME': props.email.name,
-        'EMAIL_ADDRESS': props.email.address,
-        'EMAIL_ADDRESS_BCC': props.email.bcc.join(','),
-        'TASK_CONTEXT_SIZE': props.task.contextSize.toString(),
-        'LOG_LEVEL': props.log.level,
-      }
+      'USERNAME': props.username,
+      'OPENAI_API_KEY': props.openai.apiKey,
+      'CLICKUP_API_KEY': props.clickUp.apiKey,
+      'CLICKUP_TEAM_ID': props.clickUp.teamId,
+      'CLICKUP_SPACE_ID': props.clickUp.spaceId,
+      'EMAIL_NAME': props.email.name,
+      'EMAIL_ADDRESS': props.email.address,
+      'EMAIL_ADDRESS_BCC': props.email.bcc.join(','),
+      'TASK_CONTEXT_SIZE': props.task.contextSize.toString(),
+      'LOG_LEVEL': props.log.level,
+  }
 }
