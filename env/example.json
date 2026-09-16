@@ -1,0 +1,23 @@
+{
+  "username": "Your name",
+  "openai": {
+    "apiKey": "YOUR_OPENAI_API_KEY"
+  },
+  "clickUp": {
+    "apiKey": "YOUR_CLICKUP_API_KEY",
+    "teamId": "YOUR_CLICKUP_TEAM_ID",
+    "spaceId": "YOUR_CLICKUP_SPACE_ID"
+  },
+  "email": {
+    "receiptRuleSet": "YOUR_SES_RECEIPT_RULE_SET",
+    "address": "tasks@example.com",
+    "name": "Inbox2Action",
+    "bcc": []
+  },
+  "task": {
+    "contextSize": 10
+  },
+  "log": {
+    "level": "INFO"
+  }
+}
